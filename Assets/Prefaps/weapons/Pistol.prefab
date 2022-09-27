@@ -130,6 +130,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7a3a0cc4aff2b214d9551b32a89af61d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  prefapBala: {fileID: 1631548093915934510, guid: 41bdf46838faa754aa3ae212044916c2, type: 3}
   shotType: 0
   boquilla: {fileID: 5533138503066509187}
   flashEfect: {fileID: 8931224829932974590, guid: c0968dafa3e03394a85ea9e9a3f41262, type: 3}

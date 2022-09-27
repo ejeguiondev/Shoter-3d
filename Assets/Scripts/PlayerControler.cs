@@ -2,77 +2,50 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-// el script requiere el characterControler
-[RequireComponent(typeof(CharacterController))]
 
 public class PlayerControler : MonoBehaviour
 {
-    [Header("Referencias")]
     public Camera playerCam;
-    [Header("General")]
-    public float gravityScale;
-    [Header("Movement")]
-    public float walkSpeed;
-    public float runSpeed;
-    public float jumpHeight;
-
     public Vector3 rotateInput = Vector3.zero;
     public float rotacionSensibility;
     public Vector3 moveInput = Vector3.zero;
-    public CharacterController characterControler;
-
     private float camVerticalAngle;
+
+    public Rigidbody rg;
+
+    public float movementSpeed;
+    public float jumpSpeed;
+
     // Start is called before the first frame update
     void Start()
     {
-        characterControler = GetComponent<CharacterController>();
         rotacionSensibility = 1000f;
-        walkSpeed = 5f;
-        runSpeed = 20f;
-        jumpHeight = 1.9f;
-        gravityScale = -20f;
+        rg = GetComponent<Rigidbody>();
     }
 
     // Update is called once per frame
     void Update()
     {
-        Move();
-        Look();
-    }
+        float hor = Input.GetAxisRaw("Horizontal");
+        float ver = Input.GetAxisRaw("Vertical");
 
-    void Move()
-    {
-        // si estamos encima de suelo
-        if (characterControler.isGrounded)
+        Vector3 velocity = Vector3.zero;
+
+        Vector3 direccion = (transform.forward * ver + transform.right * hor).normalized;
+        if (hor != 0 || ver != 0)
         {
-            // moverse hacia los lados Sprint
-            moveInput = new Vector3(Input.GetAxis("Horizontal"), 0, Input.GetAxis("Vertical"));
-            // no se pase de velocidad de un frame
-            moveInput = Vector3.ClampMagnitude(moveInput, 1f);
-            // correr
-            if (Input.GetButton("Sprint"))
-            {
-                // correr
-                moveInput = transform.TransformDirection(moveInput) * runSpeed;
-            } else
-            {
-                // normal
-                moveInput = transform.TransformDirection(moveInput) * walkSpeed;
-            }
-
-            // si tocamos la tecla asociada a el salto (espacio, la x de un mando, etc...)
-            // getButtondown detecta si se toco una ves getbutton si se mantiene
-            if (Input.GetButtonDown("Jump"))
-            {
-                // magia del salto
-                moveInput.y = Mathf.Sqrt(jumpHeight * -2f * gravityScale);
-            }
+            velocity = direccion * movementSpeed;
         }
-        // gravedad por que en character controler no se permiten rigidbodies.
-        moveInput.y += gravityScale * Time.deltaTime;
 
-        // mover jugador
-        characterControler.Move(moveInput * Time.deltaTime);
+        if (Input.GetKeyDown(KeyCode.Space) && trigerGround.isGrounded)
+        {
+            rg.velocity = new Vector3(rg.velocity.x, jumpSpeed, rg.velocity.z);
+        }
+
+        velocity.y = rg.velocity.y;
+        rg.velocity = velocity;
+
+        Look();
     }
 
     void Look()
@@ -85,7 +58,6 @@ public class PlayerControler : MonoBehaviour
         camVerticalAngle = Mathf.Clamp(camVerticalAngle, -70, 70);
         // agregar
         transform.Rotate(Vector3.up * rotateInput.x);
-        playerCam.transform.localRotation = Quaternion.Euler(-camVerticalAngle,0,0);
+        playerCam.transform.localRotation = Quaternion.Euler(-camVerticalAngle, 0, 0);
     }
-
 }

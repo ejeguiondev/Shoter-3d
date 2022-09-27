@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Unity.VisualScripting;
 using UnityEditor.EditorTools;
 using UnityEngine;
+using UnityEngine.AI;
 using UnityEngine.XR;
 
 public enum ShotType
@@ -12,6 +13,8 @@ public enum ShotType
 }
 public class WeaponControler : MonoBehaviour
 {
+    public GameObject prefapBala;
+
     [Header("General")]
     public ShotType shotType;
 
@@ -93,26 +96,30 @@ public class WeaponControler : MonoBehaviour
 
         addAnimation();
 
-        RaycastHit hit;
+        /*RaycastHit hit;
         if (Physics.Raycast(camPlayerTransform.position, camPlayerTransform.forward, out hit))
         {
-            Debug.Log(hit.transform.name); //te dice contra que chcocaste: pilar, pilar 2
-            //Debug.Log(hit.colliderInstanceID); id de con quien coliciono si se puede detectar la id entonces sirve
-            //Debug.Log(hit.transform.tag); //el tag de con quien coliciono
             GameObject balaAgujeroClone = Instantiate(balaAgujeroPrefap, hit.point + hit.normal * 0.001f, Quaternion.LookRotation(hit.normal));
             Destroy(balaAgujeroClone, 4f);
 
             GameObject objeto = GameObject.Find(hit.transform.name);
-            if (hit.transform.name == "suelo")
+            if (objeto.tag == "Zombie")
             {
-                // nada
-            } else
-            {
-                Destroy(objeto, 1f);
+                Destroy(objeto.GetComponent<EnemyControler>());
+                Destroy(objeto.GetComponent<NavMeshAgent>());
+                objeto.GetComponent<Rigidbody>().freezeRotation = false;
+                Destroy(objeto, 10f);
             }
 
-        }
+        }*/
 
+        GameObject bala = Instantiate(prefapBala);
+        bala.transform.position = boquilla.position;
+        Rigidbody balaRg = bala.GetComponent<Rigidbody>();
+
+        Vector3 v3Force = 2500 * transform.forward;
+        balaRg.AddForce(v3Force);
+        Destroy(bala, 10);
         lastTimeShot = Time.time;
 
     }
